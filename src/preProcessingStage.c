@@ -25,10 +25,10 @@ SOFTWARE.
 #include "filterStage.h"
 #include "utils.h"
 /*Uncomment this line to disable interpolation*/
-//#define STEP_INTERPOLATION_DISABLE
+#define STEP_INTERPOLATION_DISABLE
 static ring_buffer_t *rawBuf;
 static ring_buffer_t *ppBuf;
-static int8_t interpolationTime = 10;       //in ms
+static int8_t interpolationTime = 10; //in ms
 static int16_t timeScalingFactor = 1; //100000 for validation data or 1000000 for optimisation data (oxford-step-counter dataset)
 static int32_t startTime = -1;
 static int16_t interpolationCount = 0;
@@ -55,7 +55,7 @@ void preProcessSample(int64_t time, int32_t x, int32_t y, int32_t z)
         startTime = time;
     }
     //long magnitude = (labs(x * x) + labs(y * y) + labs(z * z)) / (labs(x) + labs(y) + labs(z));
-    int64_t magnitude = isqrt((int64_t)(x*x+y*y+z*z)); //Original
+    int64_t magnitude = isqrt((int64_t)(x * x + y * y + z * z)); //Original
     //long magnitude = (long)sqrt((x*x)+(y*y)+(z*z));
     data_point_t dataPoint;
     dataPoint.time = (time - startTime) / timeScalingFactor;

@@ -54,3 +54,7 @@ dkms.conf
 #custom
 build/
 .vscode
+bazel-bin
+bazel-out
+bazel-testlogs
+
