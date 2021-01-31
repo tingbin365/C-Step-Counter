@@ -4,7 +4,7 @@
 //     // Greeting *greet = new Greeting();
 //     // std::string actual = greet->getGreetingMessage();
 //     // std::string expected = "Hello World!";
-//     // EXPECT_EQ(expected, actual);
+//     EXPECT_EQ(1, 0);
 // }
 #ifdef __cplusplus
 extern "C"
@@ -21,7 +21,7 @@ extern "C"
 #include "scoringStage.h"
 #include "detectionStage.h"
 #include "postProcessingStage.h"
-#define PATH "__main__/tests/data/abc.txt" //package/label
+#define PATH "__main__/tests/data/data.txt" //package/label
 
 #ifdef __cplusplus
 }
@@ -68,25 +68,11 @@ int32_t getline(FILE *stream, char *buf, size_t size)
 //     return pos;
 // }
 
-static void runAlgo(void)
+static void runAlgo(std::string &path)
 {
     char linep[1024];
     size_t len = 1024;
     size_t read;
-    std::string error;
-    std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest(&error));
-
-    // Important:
-    //   If this is a test, use Runfiles::CreateForTest(&error).
-    //   Otherwise, if you don't have the value for argv[0] for whatever
-    //   reason, then use Runfiles::Create(&error).
-
-    if (runfiles == nullptr)
-    {
-        printf("Error loading runfiles configuration.%s\n", error.c_str());
-    }
-    std::string path =
-        runfiles->Rlocation(PATH);
 
     //printf("open file: %s\n", PATH);
     FILE *fp = fopen(path.c_str(), "r");
@@ -112,20 +98,25 @@ static int diff = 100000;
 int main(int argc, char *argv[])
 {
 
-    // std::string error;
-    // std::unique_ptr<Runfiles> runfiles(Runfiles::Create(argv[0], &error));
+    std::string error;
+    std::unique_ptr<Runfiles> runfiles(Runfiles::Create(argv[0], &error));
 
-    // // Important:
-    // //   If this is a test, use Runfiles::CreateForTest(&error).
-    // //   Otherwise, if you don't have the value for argv[0] for whatever
-    // //   reason, then use Runfiles::Create(&error).
+    // Important:
+    //   If this is a test, use Runfiles::CreateForTest(&error).
+    //   Otherwise, if you don't have the value for argv[0] for whatever
+    //   reason, then use Runfiles::Create(&error).
 
-    // if (runfiles == nullptr)
-    // {
-    //     printf("Error loading runfiles configuration.%s\n", error.c_str());
-    // }
-    // std::string path =
-    //     runfiles->Rlocation(PATH);
+    if (runfiles == nullptr)
+    {
+        printf("Error loading runfiles configuration.%s\n", error.c_str());
+    }
+    std::string path =
+        runfiles->Rlocation(PATH);
+    if (path.empty())
+    {
+        printf("Error loading data configuration path.%s\n");
+        exit(-1);
+    }
 
     for (int i = 0; i < argc; i++)
     {
@@ -144,7 +135,7 @@ int main(int argc, char *argv[])
                     changeWindowSize(scoringWindowSize);
                     changeDetectionThreshold(detectionThreshold_whole, detectionThreshold_frac);
                     changeTimeThreshold(postTimeThreshold);
-                    runAlgo();
+                    runAlgo(path);
                     if (diff >= abs(getSteps() - correct_answer))
                     {
                         diff = abs(getSteps() - correct_answer);

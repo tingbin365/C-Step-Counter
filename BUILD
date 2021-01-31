@@ -11,7 +11,7 @@ cc_library(
     copts =  ["/WX","/wd4005","/wd4142"],    
 )
 
-cc_test (
+cc_binary (
     name = "hardware_config",
     srcs = [
         "tests/test_main.cc",
@@ -22,5 +22,5 @@ cc_test (
         "@googletest//:gtest_main",
         "@bazel_tools//tools/cpp/runfiles:runfiles"
     ],
-    data = [":tests/data/abc.txt"]
+    data = glob(["tests/data/*.txt"])
 )

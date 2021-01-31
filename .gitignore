@@ -57,4 +57,5 @@ build/
 bazel-bin
 bazel-out
 bazel-testlogs
+bazel-c-step-counter
 
