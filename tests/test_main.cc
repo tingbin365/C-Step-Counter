@@ -21,11 +21,16 @@ extern "C"
 #include "scoringStage.h"
 #include "detectionStage.h"
 #include "postProcessingStage.h"
-#define PATH "d:\\temp\\data.txt"
+#define PATH "__main__/tests/data/abc.txt" //package/label
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "tools/cpp/runfiles/runfiles.h" // 一定要放在extern "C" 外面
+#include <memory>
+
+using bazel::tools::cpp::runfiles::Runfiles;
 
 static int correct_answer = 240;
 
@@ -68,8 +73,23 @@ static void runAlgo(void)
     char linep[1024];
     size_t len = 1024;
     size_t read;
+    std::string error;
+    std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest(&error));
+
+    // Important:
+    //   If this is a test, use Runfiles::CreateForTest(&error).
+    //   Otherwise, if you don't have the value for argv[0] for whatever
+    //   reason, then use Runfiles::Create(&error).
+
+    if (runfiles == nullptr)
+    {
+        printf("Error loading runfiles configuration.%s\n", error.c_str());
+    }
+    std::string path =
+        runfiles->Rlocation(PATH);
+
     //printf("open file: %s\n", PATH);
-    FILE *fp = fopen(PATH, "r");
+    FILE *fp = fopen(path.c_str(), "r");
     if (fp == NULL)
     {
         printf("Error while opening the file.%s\n", PATH);
@@ -91,10 +111,27 @@ static void runAlgo(void)
 static int diff = 100000;
 int main(int argc, char *argv[])
 {
+
+    // std::string error;
+    // std::unique_ptr<Runfiles> runfiles(Runfiles::Create(argv[0], &error));
+
+    // // Important:
+    // //   If this is a test, use Runfiles::CreateForTest(&error).
+    // //   Otherwise, if you don't have the value for argv[0] for whatever
+    // //   reason, then use Runfiles::Create(&error).
+
+    // if (runfiles == nullptr)
+    // {
+    //     printf("Error loading runfiles configuration.%s\n", error.c_str());
+    // }
+    // std::string path =
+    //     runfiles->Rlocation(PATH);
+
     for (int i = 0; i < argc; i++)
     {
         printf("param %d: %s\n", i, argv[i]);
     }
+    correct_answer = atoi(argv[1]);
     initAlgo();
     for (size_t scoringWindowSize = 30; scoringWindowSize <= 40; scoringWindowSize++)
     {
@@ -119,4 +156,5 @@ int main(int argc, char *argv[])
             }
         }
     }
+    printf("done\n");
 }
